@@ -5,8 +5,8 @@ import * as p5 from "p5";
 import { Midi } from '@tonejs/midi'
 import PlayIcon from './functions/PlayIcon.js';
 
-import audio from "../audio/circles-no-3.ogg";
-import midi from "../audio/circles-no-3.mid";
+import audio from "../audio/hexagons-no-3.ogg";
+import midi from "../audio/hexagons-no-3.mid";
 
 const P5SketchWithAudio = () => {
     const sketchRef = useRef();
@@ -60,31 +60,65 @@ const P5SketchWithAudio = () => {
 
         p.origin = null;
 
-        p.hexSize = 30;
+        p.hexSize = 20;
         
         p.mapSize = 16;
 
         p.padding = 0;
 
+        p.hexagons = [];
+
         p.setup = () => {
             p.canvas = p.createCanvas(p.canvasWidth, p.canvasHeight);
             p.angleMode(p.RADIANS);
+            p.noLoop();
 	        p.origin = p.createVector(p.width / 2, p.height / 2);
-            // p.background(0);
-            p.translate(p.width / 2, p.height / 2);
+            p.background(0);
+            p.populateHexagonsArray();
         }
 
         p.draw = () => {
+            for (let i = 0; i < p.hexagons.length; i++) {
+                const { center, size, q, r } = p.hexagons[i];
+
+                setTimeout(
+                    function () {
+                        p.drawHexagon(center, size, q, r);
+                    },
+                    1000
+                );
+                
+            }
+            if(p.audioLoaded && p.song.isPlaying()){
+                
+            }
+        }
+
+        p.populateHexagonsArray = () => {
             for (var q = -p.mapSize; q <= p.mapSize; q++) {
 				var r1 = p.max(-p.mapSize, -q - p.mapSize);
 				var r2 = p.min(p.mapSize, -q + p.mapSize);
 				for (var r = r1; r <= r2; r++) {
-					p.drawHexagon(p.hexToPixel(q, r), p.hexSize, q, r);
+                    const center = p.hexToPixel(q, r);
+					p.hexagons.push(
+                        {
+                            center: center,
+                            size: p.hexSize,
+                            q: q,
+                            r: r,
+                            sort: Math.abs(q * r * (-q-r))
+                        }
+                    );
 				}
 		    }
-            if(p.audioLoaded && p.song.isPlaying()){
 
-            }
+            p.hexagons.sort(
+                (a, b) => { 
+                    return a.sort - b.sort;
+                } 
+            );
+
+            console.log(p.hexagons);
         }
 
         p.drawHexagon = (center, size, q, r) => {
@@ -106,11 +140,6 @@ const P5SketchWithAudio = () => {
                 p.line(points[i-1].x, points[i-1].y, points[i % 6].x, points[i % 6].y);
             }
             p.endShape();
-            p.fill(255);
-            
-            p.textSize(10);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.text(q + " " + r + " \n" + (-q-r), center.x + 1, center.y + 2)
         }
 
         p.hexCorner = (center, size, i) => {
