@@ -28,7 +28,8 @@ const P5SketchWithAudio = () => {
         p.loadMidi = () => {
             Midi.fromUrl(midi).then(
                 function(result) {
-                    const noteSet1 = result.tracks[5].notes; // Synth 1
+                    console.log(result);
+                    const noteSet1 = result.tracks[3].notes; // Thor 2 - Awakenings
                     p.scheduleCueSet(noteSet1, 'executeCueSet1');
                     p.audioLoaded = true;
                     document.getElementById("loader").classList.add("loading--complete");
@@ -78,6 +79,17 @@ const P5SketchWithAudio = () => {
         }
 
         p.draw = () => {
+            
+            if(p.audioLoaded && p.song.isPlaying()){
+                
+            }
+        }
+
+        p.executeCueSet1 = (note) => {
+            const { duration } = note,
+                delay = (duration * 1000) / (p.hexagons.length * 0.9);
+
+            p.background(p.random(255), p.random(255), p.random(255));
             for (let i = 0; i < p.hexagons.length; i++) {
                 const { center, size, q, r } = p.hexagons[i];
 
@@ -85,11 +97,8 @@ const P5SketchWithAudio = () => {
                     function () {
                         p.drawHexagon(center, size, q, r);
                     },
-                    1000
+                    delay * i
                 );
-                
-            }
-            if(p.audioLoaded && p.song.isPlaying()){
                 
             }
         }
@@ -117,8 +126,6 @@ const P5SketchWithAudio = () => {
                     return a.sort - b.sort;
                 } 
             );
-
-            console.log(p.hexagons);
         }
 
         p.drawHexagon = (center, size, q, r) => {
@@ -157,13 +164,6 @@ const P5SketchWithAudio = () => {
             var x = (p.sqrt(3) * q + p.sqrt(3)/2 * r) * (p.hexSize) ;
             var y = (0 * q + 3/2 * r) * p.hexSize;
             return p.createVector(x + p.origin.x, y + p.origin.y);
-        }
-
-        p.executeCueSet1 = (note) => {
-            p.background(p.random(255), p.random(255), p.random(255));
-            p.fill(p.random(255), p.random(255), p.random(255));
-            p.noStroke();
-            p.ellipse(p.width / 2, p.height / 2, p.width / 4, p.width / 4);
         }
 
         p.hasStarted = false;
