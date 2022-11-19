@@ -75,7 +75,6 @@ const P5SketchWithAudio = () => {
             p.noLoop();
 	        p.origin = p.createVector(p.width / 2, p.height / 2);
             p.background(0);
-            p.populateHexagonsArray();
         }
 
         p.draw = () => {
@@ -86,18 +85,27 @@ const P5SketchWithAudio = () => {
         }
 
         p.executeCueSet1 = (note) => {
-            const { duration } = note,
-                delay = (duration * 1000) / (p.hexagons.length * 0.9);
-
+            const { duration, currentCue } = note,
+                delay = (duration * 1000) / (p.hexagons.length);
+            p.hexagons = currentCue % 4 === 1 ? [] : p.hexagons;
+            p.mapSize = p.random([6, 8, 10, 12, 14, 16]);
+            p.hexSize = p.random([8, 16, 32]);
+            p.populateHexagonsArray();
             p.background(p.random(255), p.random(255), p.random(255));
             for (let i = 0; i < p.hexagons.length; i++) {
                 const { center, size, q, r } = p.hexagons[i];
 
                 setTimeout(
                     function () {
-                        p.drawHexagon(center, size, q, r);
+                        // p.mapSize = p.random(6, 24);
+                        p.stroke(255,255,255);
+                        p.drawHexagon(center, size, q, r, 191);
+                        p.drawHexagon(center, size / 2, q, r, 191);
+                        // p.stroke(0, 0, 0);
+                        // p.drawHexagon(center, size / 2, q, r, 0, p.color(255,255,255, 0));
+                        // p.drawHexagon(center, size / 4, q, r, 255);
                     },
-                    delay * i
+                    (delay * i) * 0.8
                 );
                 
             }
@@ -128,7 +136,7 @@ const P5SketchWithAudio = () => {
             );
         }
 
-        p.drawHexagon = (center, size, q, r) => {
+        p.drawHexagon = (center, size, q, r, opacity, fill = false) => {
             const points = [];
             for(var i = 0; i < 6; i++){
                 points.push(p.hexCorner(center, size - p.padding, i));
@@ -137,11 +145,17 @@ const P5SketchWithAudio = () => {
             
             p.beginShape();
             for(i = 1; i <= 6; i++){
-                p.fill(
-                    p.map(-q -r, -p.mapSize, p.mapSize, 0, 255),
-                    p.map(r, -p.mapSize, p.mapSize, 0, 255), 
-                    p.map(q, -p.mapSize, p.mapSize, 0, 255)
-                );
+                if(fill) {
+                    p.fill(fill);
+                }
+                else {
+                    p.fill(
+                        p.map(-q -r, -p.mapSize, p.mapSize, 0, 255),
+                        p.map(r, -p.mapSize, p.mapSize, 0, 255), 
+                        p.map(q, -p.mapSize, p.mapSize, 0, 255),
+                        opacity
+                    );
+                }
                 p.point(points[i % 6].x, points[i % 6].y);
                 p.vertex(points[i % 6].x, points[i % 6].y);
                 p.line(points[i-1].x, points[i-1].y, points[i % 6].x, points[i % 6].y);
