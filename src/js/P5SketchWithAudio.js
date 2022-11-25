@@ -69,7 +69,10 @@ const P5SketchWithAudio = () => {
 
         p.hexagons = [];
 
+        p.darkMode = true;
+
         p.setup = () => {
+            p.randomColor = require('randomcolor');
             p.canvas = p.createCanvas(p.canvasWidth, p.canvasHeight);
             p.angleMode(p.RADIANS);
             p.noLoop();
@@ -87,25 +90,44 @@ const P5SketchWithAudio = () => {
         p.executeCueSet1 = (note) => {
             const { duration, currentCue } = note,
                 delay = (duration * 1000) / (p.hexagons.length);
+            p.darkMode = currentCue % 4 === 1 ? !p.darkMode : p.darkMode;  
             p.hexagons = currentCue % 4 === 1 ? [] : p.hexagons;
-            p.mapSize = p.random([6, 8, 10, 12, 14, 16]);
-            p.hexSize = p.random([8, 16, 32]);
+            if(currentCue < 4){
+                p.mapSize = currentCue % 4 ? 18 - ((currentCue % 4) * 2) : 8;
+                p.hexSize = currentCue % 4 ? 40 - ((currentCue % 4) * 8) : 8;
+            }
+            else {
+                p.mapSize = p.random(8, 12, 16, 20);
+                p.hexSize = p.random(p.mapSize, p.mapSize * 4)
+            }
+            
             p.populateHexagonsArray();
+            if(p.darkMode) {
+                p.background(
+                    p.random(
+                        p.randomColor({luminosity: 'light', count: 8})
+                    )
+                );
+                p.stroke(0,0,0);
+            }
+            else {
+                p.background(
+                    p.random(
+                        p.randomColor({luminosity: 'dark', count: 8})
+                    )
+                );
+                p.stroke(255,255,255);
+            }
             p.background(p.random(255), p.random(255), p.random(255));
             for (let i = 0; i < p.hexagons.length; i++) {
                 const { center, size, q, r } = p.hexagons[i];
-
                 setTimeout(
                     function () {
                         // p.mapSize = p.random(6, 24);
-                        p.stroke(255,255,255);
                         p.drawHexagon(center, size, q, r, 191);
                         p.drawHexagon(center, size / 2, q, r, 191);
-                        // p.stroke(0, 0, 0);
-                        // p.drawHexagon(center, size / 2, q, r, 0, p.color(255,255,255, 0));
-                        // p.drawHexagon(center, size / 4, q, r, 255);
                     },
-                    (delay * i) * 0.8
+                    (delay * i)
                 );
                 
             }
@@ -140,7 +162,6 @@ const P5SketchWithAudio = () => {
             const points = [];
             for(var i = 0; i < 6; i++){
                 points.push(p.hexCorner(center, size - p.padding, i));
-                var c = p.hexCorner(center, size, i);
             }
             
             p.beginShape();
