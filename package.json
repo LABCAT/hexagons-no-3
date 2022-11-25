@@ -1,7 +1,7 @@
 {
-  "name": "react-p5js-tonejs-starter-kit",
+  "name": "hexagons-no-3",
   "version": "1.0.0",
-  "homepage": ".",
+  "homepage": "https://hexagons-no-3.labcat.nz",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
