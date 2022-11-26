@@ -97,8 +97,8 @@ const P5SketchWithAudio = () => {
                 p.hexSize = currentCue % 4 ? 40 - ((currentCue % 4) * 8) : 8;
             }
             else {
-                p.mapSize = p.random(8, 12, 16, 20);
-                p.hexSize = p.random(p.mapSize, p.mapSize * 4)
+                p.mapSize = p.random([8, 12, 16, 32]);
+                p.hexSize = p.random([6, 12, 18, 24])
             }
             
             p.populateHexagonsArray();
@@ -162,6 +162,7 @@ const P5SketchWithAudio = () => {
             const points = [];
             for(var i = 0; i < 6; i++){
                 points.push(p.hexCorner(center, size - p.padding, i));
+                var c = p.hexCorner(center, size, i);
             }
             
             p.beginShape();
